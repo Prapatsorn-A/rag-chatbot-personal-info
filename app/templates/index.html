@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #e0f7fa, #b2ebf2); /* Light teal background */
+            color: #333;
+        }
+        .chat-container {
+            width: 420px;
+            background-color: #fff;
+            border-radius: 16px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease-in-out;
+        }
+        .chat-header {
+            background-color: #00695c; /* Dark teal header */
+            color: #fff;
+            padding: 20px;
+            font-size: 20px;
+            font-weight: bold;
+            text-align: center;
+            border-bottom: 2px solid #004d40;
+            border-radius: 16px 16px 0 0;
+            letter-spacing: 1px;
+        }
+        .chat-body {
+            padding: 20px;
+            height: 350px;
+            overflow-y: auto;
+            background-color: #f1f1f1;
+            border-bottom: 2px solid #ddd;
+            font-size: 14px;
+            line-height: 1.6;
+            transition: opacity 0.4s ease-in-out;
+        }
+        .chat-footer {
+            display: flex;
+            padding: 15px;
+            background-color: #f1f1f1;
+            border-top: 1px solid #ddd;
+        }
+        .chat-footer input {
+            flex: 1;
+            padding: 15px;
+            font-size: 14px;
+            border: 1px solid #ddd;
+            border-radius: 30px;
+            outline: none;
+            margin-right: 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            transition: box-shadow 0.3s ease-in-out;
+        }
+        .chat-footer input:focus {
+            box-shadow: 0 0 10px rgba(0, 123, 255, 0.6);
+        }
+        .chat-footer button {
+            padding: 15px 25px;
+            background-color: #00695c; /* Dark teal button */
+            color: #fff;
+            border: none;
+            border-radius: 30px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+        .chat-footer button:hover {
+            background-color: #004d40; /* Darker teal on hover */
+            transform: scale(1.05);
+        }
+        .message {
+            margin-bottom: 15px;
+            padding: 12px 20px;
+            border-radius: 20px;
+            max-width: 80%;
+            word-wrap: break-word;
+            opacity: 0;
+            animation: fadeIn 0.6s forwards;
+        }
+        .message.user {
+            background-color: #00695c; /* Dark teal for user */
+            color: white;
+            text-align: right;
+            margin-left: auto;
+            border-bottom-left-radius: 0;
+        }
+        .message.bot {
+            background-color: #e0f7fa; /* Light teal for bot */
+            color: #333;
+            text-align: left;
+            margin-right: auto;
+            border-bottom-right-radius: 0;
+        }
+        .message.bot .source {
+            font-size: 0.85em;
+            color: #777;
+            margin-top: 5px;
+        }
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            Chatbot
+        </div>
+        <div class="chat-body" id="chat-body">
+            <!-- Chat messages will be appended here -->
+        </div>
+        <div class="chat-footer">
+            <input type="text" id="chat-input" placeholder="Type a message...">
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+
+    <script>
+        function sendMessage() {
+            const input = document.getElementById('chat-input');
+            const message = input.value.trim();
+            if (message) {
+                appendMessage('user', message);
+                input.value = '';
+
+                fetch('/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ message: message }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    appendMessage('bot', data.answer);
+                    if (data.source_documents && data.source_documents.length > 0) {
+                        appendSource(data.source_documents);
+                    }
+                });
+            }
+        }
+
+        function appendMessage(sender, text) {
+            const chatBody = document.getElementById('chat-body');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+            messageDiv.textContent = text;
+            chatBody.appendChild(messageDiv);
+            chatBody.scrollTop = chatBody.scrollHeight;
+        }
+
+        function appendSource(sources) {
+            const chatBody = document.getElementById('chat-body');
+            const sourceDiv = document.createElement('div');
+            sourceDiv.className = 'message bot source';
+            sourceDiv.textContent = 'Sources: ' + sources.join(', ');
+            chatBody.appendChild(sourceDiv);
+            chatBody.scrollTop = chatBody.scrollHeight;
+        }
+    </script>
+</body>
+</html>
