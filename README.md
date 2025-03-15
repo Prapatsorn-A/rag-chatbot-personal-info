@@ -6,8 +6,8 @@ This project implements a **Retrieval-Augmented Generation (RAG)**-based chatbot
 
 **1. Relevant Sources:**
 - **Resume:** A PDF document containing my education, work experience, and skills.
-- **Challenges and Goals:** A text file outlining my academic challenges and objectives.
-- **Core Beliefs:** A text file outlining my beliefs about technology and society.
+- **Academic Challenges and Goals:** A text file outlining my academic challenges and objectives.
+- **Tech and Society Beliefs:** A text file outlining my beliefs about technology and society.
 
 **2. Prompt Design:**
 - The chatbot uses a **prompt template** to guide its responses. The template includes placeholders for context and question, ensuring the chatbot provides gentle and informative answers.
